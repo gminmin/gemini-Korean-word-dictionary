@@ -5,11 +5,13 @@ const translations = {
         "nav.gallery": "작품 갤러리",
         "nav.pursuit": "추구하는 바",
         "nav.workflow": "워크플로우",
+        "nav.join": "부원 모집",
         "nav.contact": "문의하기",
         "nav.title": "진부중학교 3D 동아리",
         "hero.title": "상상을 현실로,<br>창작의 세계",
         "hero.subtitle": "진부중학교 3D 동아리입니다.",
         "hero.cta": "작품 보러가기",
+        "hero.join": "지금 지원하기",
         "about.title": "About",
         "about.subtitle": "창의력과 기술의 만남",
         "about.desc": "3D 창작물을 통해 우리가 오랫동안 기억하고 싶은것, 이제는 볼수없는것, 현실에 없는것을 만들어냅니다. 그리고 그 배경에는 무료 오픈소스 프로그램 'Blender'가 있습니다.",
@@ -51,7 +53,14 @@ const translations = {
         "workflow.step6.title": "렌더",
         "workflow.step6.desc": "조명과 카메라를 설정하여 최종 이미지를 출력합니다.",
         "workflow.start_experience": "직접 경험해보기",
-        "workflow.start_experience_sub": "웹 브라우저에서 바로 작동하는 3D 가상 스튜디오를 체험해보세요."
+        "workflow.start_experience_sub": "웹 브라우저에서 바로 작동하는 3D 가상 스튜디오를 체험해보세요.",
+        "contact.title": "문의하기",
+        "contact.subtitle": "무엇이든 물어보세요! 신속하게 답변해 드리겠습니다.",
+        "contact.name": "이름",
+        "contact.info": "연락처 (이메일/번호)",
+        "contact.message": "문의 내용",
+        "contact.submit": "문의 보내기",
+        "contact.success": "문의가 성공적으로 전송되었습니다!"
     },
     en: {
         "nav.home": "Home",
@@ -59,11 +68,13 @@ const translations = {
         "nav.gallery": "Gallery",
         "nav.pursuit": "Pursuit",
         "nav.workflow": "Workflow",
+        "nav.join": "Join Us",
         "nav.contact": "Contact",
         "nav.title": "Jinbu Middle School 3D Club",
         "hero.title": "Imagination to Reality,<br>World of Creation",
         "hero.subtitle": "Jinbu Middle School 3D Club",
         "hero.cta": "View Works",
+        "hero.join": "Apply Now",
         "about.title": "About",
         "about.subtitle": "Where Creativity Meets Technology",
         "about.desc": "We turn ideas into reality through 3D modeling. and we learn various tools like 'Blender' and grow together.",
@@ -90,6 +101,13 @@ const translations = {
         "workflow.step6.desc": "Set lighting and camera to output the final image.",
         "workflow.start_experience": "Experience it yourself",
         "workflow.start_experience_sub": "Try the 3D Virtual Studio that works right in your browser.",
+        "contact.title": "Contact Us",
+        "contact.subtitle": "Ask us anything! We'll get back to you soon.",
+        "contact.name": "Name",
+        "contact.info": "Contact Info (Email/Phone)",
+        "contact.message": "Message",
+        "contact.submit": "Send Message",
+        "contact.success": "Your inquiry has been sent successfully!",
         "pursuit.more": "More about our club",
         "pursuit.title": "Pursuit",
         "pursuit.subtitle": "The Pursuit of the club is as follows.",
@@ -363,4 +381,47 @@ document.addEventListener('DOMContentLoaded', () => {
             aboutImage.style.transform = `translateY(${scrolled * 0.1}px)`;
         }
     });
+
+    // --- Contact Form Submission ---
+    const contactForm = document.getElementById('contact-form');
+    const contactSubmitBtn = document.getElementById('contact-submit-btn');
+    const contactSuccessMsg = document.getElementById('contact-success');
+
+    // [중요] join-script.js와 동일한 구글 앱스 스크립트 URL을 입력하세요.
+    const CONTACT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbvcZ-VWrVaIr1ZXU3LUvFRkR4gYlKfALaz9rw4DjRVlIznoaP_hyyBUStomiPrQgAY8Q/exec';
+
+    if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const originalBtnContent = contactSubmitBtn.innerHTML;
+            contactSubmitBtn.disabled = true;
+            contactSubmitBtn.innerHTML = '<span>Sending...</span> <div class="loading-spinner"></div>';
+
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData.entries());
+            data.type = 'contact'; // 데이터 타입 구분자 추가
+
+            try {
+                if (CONTACT_SCRIPT_URL) {
+                    await fetch(CONTACT_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify(data),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                } else {
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+
+                contactForm.classList.add('hidden');
+                contactSuccessMsg.classList.remove('hidden');
+            } catch (error) {
+                console.error("Submission failed:", error);
+                alert("전송에 실패했습니다. 다시 시도해 주세요.");
+                contactSubmitBtn.disabled = false;
+                contactSubmitBtn.innerHTML = originalBtnContent;
+            }
+        });
+    }
 });
